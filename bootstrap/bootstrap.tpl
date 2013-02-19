@@ -20,7 +20,8 @@
 		typeof module === 'object' &&
 		typeof module.exports === 'object') {
 		module.exports = {{alias}};
-	} else if (typeof global.window === 'object') {
+	} else if (typeof global.krang !== 'function' ||
+		!global.define({{alias}})) {
 		global[{{alias.toJSON()}}] = {{alias}};
 	}
 

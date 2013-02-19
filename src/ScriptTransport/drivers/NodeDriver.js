@@ -53,9 +53,9 @@ define(['../../Utils', '../../Krang'], function(Utils, Krang) {
 				response.on('end', function() {
 					try {
 
-						new Function('define', data)(function() {
+						new Function('define, require', data)(function() {
 							Krang.define(requestURI, arguments, success);
-						});
+						}, require);
 
 					} catch (exception) {
 						fail(exception);
@@ -71,9 +71,9 @@ define(['../../Utils', '../../Krang'], function(Utils, Krang) {
 					if (error) return fail(error);
 					try {
 
-						new Function('define', data.toString())(function() {
+						new Function('define, require', data.toString())(function() {
 							Krang.define(requestURI, arguments, success);
-						});
+						}, require);
 
 					} catch (exception) {
 						fail(exception);

@@ -60,7 +60,7 @@ define(function() {
 		T_MODULE: 4,
 		T_RESOURCE: 5,
 
-		VERSION: 0.3,
+		VERSION: 0.4,
 
 		message: message,
 		define: define,

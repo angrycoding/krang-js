@@ -10,26 +10,31 @@ define([
 		scripts = document.getElementsByTagName('script');
 
 	Global.define = function() {
+
+		var scriptURI = null;
+
 		if (Global.document && Global.document.currentScript) {
-			var scriptURI = Global.document.currentScript.src;
-			Krang.define(scriptURI, arguments, defineMap[scriptURI]);
+			scriptURI = Global.document.currentScript.src;
 		} else try { throw new Error(); } catch (exception) {
 			if (exception.stack) {
-				var scriptURI = exception.stack;
+				scriptURI = exception.stack;
 				if (scriptURI.indexOf('@') === -1) {
 					scriptURI = scriptURI.split('\n').pop();
 					scriptURI = scriptURI.split(' ').pop();
 				} else scriptURI = scriptURI.split('@').pop();
 				scriptURI = scriptURI.split(/(\:\d+)+\s*$/).shift();
-				Krang.define(scriptURI, arguments, defineMap[scriptURI]);
 			} else for (var c = 0; c < scripts.length; c++) {
 				if (scripts[c].readyState === 'interactive') {
-					var scriptURI = scripts[c].src;
-					Krang.define(scriptURI, arguments, defineMap[scriptURI]);
+					scriptURI = scripts[c].src;
 					break;
 				}
 			}
 		}
+
+		if (!defineMap.hasOwnProperty(scriptURI)) return false;
+		Krang.define(scriptURI, arguments, defineMap[scriptURI]);
+		return true;
+
 	};
 
 

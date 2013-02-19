@@ -615,7 +615,7 @@
 		T_MODULE: 4,
 		T_RESOURCE: 5,
 
-		VERSION: 0.3,
+		VERSION: 0.4,
 
 		message: message,
 		define: define,
@@ -832,9 +832,9 @@
 				response.on('end', function() {
 					try {
 
-						new Function('define', data)(function() {
+						new Function('define, require', data)(function() {
 							Krang.define(requestURI, arguments, success);
-						});
+						}, require);
 
 					} catch (exception) {
 						fail(exception);
@@ -850,9 +850,9 @@
 					if (error) return fail(error);
 					try {
 
-						new Function('define', data.toString())(function() {
+						new Function('define, require', data.toString())(function() {
 							Krang.define(requestURI, arguments, success);
-						});
+						}, require);
 
 					} catch (exception) {
 						fail(exception);
@@ -878,26 +878,31 @@
 		scripts = document.getElementsByTagName('script');
 
 	Global.define = function() {
+
+		var scriptURI = null;
+
 		if (Global.document && Global.document.currentScript) {
-			var scriptURI = Global.document.currentScript.src;
-			Krang.define(scriptURI, arguments, defineMap[scriptURI]);
+			scriptURI = Global.document.currentScript.src;
 		} else try { throw new Error(); } catch (exception) {
 			if (exception.stack) {
-				var scriptURI = exception.stack;
+				scriptURI = exception.stack;
 				if (scriptURI.indexOf('@') === -1) {
 					scriptURI = scriptURI.split('\n').pop();
 					scriptURI = scriptURI.split(' ').pop();
 				} else scriptURI = scriptURI.split('@').pop();
 				scriptURI = scriptURI.split(/(\:\d+)+\s*$/).shift();
-				Krang.define(scriptURI, arguments, defineMap[scriptURI]);
 			} else for (var c = 0; c < scripts.length; c++) {
 				if (scripts[c].readyState === 'interactive') {
-					var scriptURI = scripts[c].src;
-					Krang.define(scriptURI, arguments, defineMap[scriptURI]);
+					scriptURI = scripts[c].src;
 					break;
 				}
 			}
 		}
+
+		if (!defineMap.hasOwnProperty(scriptURI)) return false;
+		Krang.define(scriptURI, arguments, defineMap[scriptURI]);
+		return true;
+
 	};
 
 
@@ -1809,7 +1814,8 @@
 		typeof module === 'object' &&
 		typeof module.exports === 'object') {
 		module.exports = krang;
-	} else if (typeof global.window === 'object') {
+	} else if (typeof global.krang !== 'function' ||
+		!global.define(krang)) {
 		global["krang"] = krang;
 	}
 
