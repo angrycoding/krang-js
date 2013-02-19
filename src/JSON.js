@@ -43,7 +43,7 @@ define(function () {
 
   var hop = Object.hasOwnProperty;
 
-  return function (json, opt_reviver) {
+  function JSONParse(json, opt_reviver) {
 	// Split into tokens
 	var toks = json.match(jsonToken);
 	// Construct the object to return
@@ -178,4 +178,29 @@ define(function () {
 
 	return result;
   };
+
+  function JSONStringify(value) {
+		var t = typeof (value);
+		if (t != "object" || value === null) {
+			// simple data type
+			if (t == "string") value = '"'+value+'"';
+			return String(value);
+		} else {
+			// recurse array or object
+			var n, v, json = [], arr = (value && value.constructor == Array);
+			for (n in value) {
+				v = value[n]; t = typeof(v);
+				if (t == "string") v = '"'+v+'"';
+				else if (t == "object" && v !== null) v = JSONStringify(v);
+				json.push((arr ? "" : '"' + n + '":') + String(v));
+			}
+			return (arr ? "[" : "{") + String(json) + (arr ? "]" : "}");
+		}
+	}
+
+  return {
+  	parse: JSONParse,
+  	stringify: JSONStringify
+  };
+
 });

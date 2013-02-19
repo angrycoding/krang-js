@@ -1,4 +1,37 @@
-define(['../../Utils'], function(Utils) {
+define([
+	'!global',
+	'../../Utils',
+	'../../Krang'
+], function(Global, Utils, Krang) {
+
+	var scripts, defineMap = {};
+
+	if (Global.document && Global.document.getElementsByTagName)
+		scripts = document.getElementsByTagName('script');
+
+	Global.define = function() {
+		if (Global.document && Global.document.currentScript) {
+			var scriptURI = Global.document.currentScript.src;
+			Krang.define(scriptURI, arguments, defineMap[scriptURI]);
+		} else try { throw new Error(); } catch (exception) {
+			if (exception.stack) {
+				var scriptURI = exception.stack;
+				if (scriptURI.indexOf('@') === -1) {
+					scriptURI = scriptURI.split('\n').pop();
+					scriptURI = scriptURI.split(' ').pop();
+				} else scriptURI = scriptURI.split('@').pop();
+				scriptURI = scriptURI.split(/(\:\d+)+\s*$/).shift();
+				Krang.define(scriptURI, arguments, defineMap[scriptURI]);
+			} else for (var c = 0; c < scripts.length; c++) {
+				if (scripts[c].readyState === 'interactive') {
+					var scriptURI = scripts[c].src;
+					Krang.define(scriptURI, arguments, defineMap[scriptURI]);
+					break;
+				}
+			}
+		}
+	};
+
 
 	var XMLHttpFactories = [
 		function() { return new XMLHttpRequest() },
@@ -30,26 +63,7 @@ define(['../../Utils'], function(Utils) {
 		sElement.setAttribute('type', 'text/javascript');
 		sElement.setAttribute('async', 'async');
 		sElement.setAttribute('src', requestURI);
-
-		var done = false;
-
-		sElement.onload =
-		sElement.onreadystatechange = function(event) {
-			if (!done && (!this.readyState ||
-				this.readyState === 'loaded' ||
-				this.readyState === 'complete')) {
-				done = true;
-				success();
-				this.onload = this.onreadystatechange = null;
-				this.parentNode.removeChild(this);
-			}
-		};
-
-		sElement.onerror = function() {
-			this.parentNode.removeChild(this);
-			fail();
-		};
-
+		defineMap[requestURI] = success;
 		document.getElementsByTagName('head')[0].appendChild(sElement);
 	}
 
@@ -63,8 +77,11 @@ define(['../../Utils'], function(Utils) {
 				var status = request.status;
 				if (status !== 200) return fail('not found');
 				try {
-					eval(request.responseText);
-					success();
+
+					new Function('define', request.responseText)(function() {
+						Krang.define(requestURI, arguments, success);
+					});
+
 				} catch (exception) {
 					fail(exception);
 				}

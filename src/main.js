@@ -10,7 +10,7 @@ define([
 
 			Krang.message(
 				'validating configuration:',
-				JSON.stringify(newConfig)
+				Utils.json.stringify(newConfig)
 			);
 
 			var baseURI = config.baseURI;
@@ -43,10 +43,15 @@ define([
 
 			newConfig = Utils.object.merge(config, newConfig);
 
-			Krang.message('new configuration is:', JSON.stringify(newConfig));
+			Krang.message(
+				'new configuration is:',
+				Utils.json.stringify(newConfig)
+			);
 
 			return Context(newConfig);
 		}
+
+		factory.version = Krang.VERSION;
 
 		factory.require = function() {
 			var deps = [], callback = null;
@@ -75,16 +80,6 @@ define([
 		};
 
 		return factory;
-	};
-
-	Global.define = function() {
-		var args = Array.prototype.slice.call(arguments);
-		var dependencies, definition = args.shift();
-		if (args.length) {
-			dependencies = definition;
-			definition = args.shift();
-		}
-		Krang.defines.push([dependencies, definition]);
 	};
 
 	return Context({

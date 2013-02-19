@@ -1,10 +1,9 @@
 define(function() {
 
-	var defines = [];
-
 	function message(message) {
 		var args = Array.prototype.slice.call(arguments);
-		console.info.apply(console, ['[ KRANG ]'].concat(args));
+		args.unshift('[ KRANG ]');
+		console.log(args.join(' '));
 	}
 
 	function KrangException(file, message) {
@@ -44,25 +43,33 @@ define(function() {
 		));
 	}
 
+	function define(moduleID, args, ret) {
+		var args = Array.prototype.slice.call(args);
+		var dependencies, definition = args.shift();
+		if (args.length) {
+			dependencies = definition;
+			definition = args.shift();
+		}
+		ret(dependencies, definition);
+	}
+
 	return {
-		T_VALUE: 'VERBATIM VALUE',
+		T_VALUE: 1,
+		T_CONFIG: 2,
+		T_GLOBAL: 3,
+		T_MODULE: 4,
+		T_RESOURCE: 5,
 
-		T_CONFIG: 'CONFIGURATION VALUE',
-		T_GLOBAL: 'GLOBAL OBJECT REFERENCE',
-		T_MODULE: 'MODULE OBJECT REFERENCE',
+		VERSION: 0.3,
 
-		T_RESOURCE: 'EXTERNAL RESOURCE',
-
-		defines: defines,
 		message: message,
-
+		define: define,
 
 		TypeException: TypeException,
 		AliasException: AliasException,
 		DataURIException: DataURIException,
-
-
 		LoadException: LoadException
+
 	};
 
 });

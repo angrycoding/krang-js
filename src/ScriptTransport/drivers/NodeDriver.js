@@ -1,4 +1,4 @@
-define(['../../Utils'], function(Utils) {
+define(['../../Utils', '../../Krang'], function(Utils, Krang) {
 
 	var URL, Schemes;
 	var initialized = false;
@@ -53,10 +53,10 @@ define(['../../Utils'], function(Utils) {
 				response.on('end', function() {
 					try {
 
-						eval(data);
+						new Function('define', data)(function() {
+							Krang.define(requestURI, arguments, success);
+						});
 
-
-						success();
 					} catch (exception) {
 						fail(exception);
 					}
@@ -67,11 +67,14 @@ define(['../../Utils'], function(Utils) {
 		} else if (requestScheme === 'file') {
 
 			Schemes[requestScheme].readFile(
-				requestURI, function(error, data) {
+				requestObj.path, function(error, data) {
 					if (error) return fail(error);
 					try {
-						eval(data.toString());
-						success();
+
+						new Function('define', data.toString())(function() {
+							Krang.define(requestURI, arguments, success);
+						});
+
 					} catch (exception) {
 						fail(exception);
 					}

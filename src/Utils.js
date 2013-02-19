@@ -1,7 +1,4 @@
-define([
-	'!global',
-	'JSONParser'
-], function(Global, JSONParser) {
+define(['!global', 'JSON'], function(Global, JSON) {
 
 	var URL_DIRNAME_REGEXP = /^(.*)\//;
 	var FILE_TYPE_REGEXP = /.+\.([^\.]+)$/;
@@ -154,10 +151,16 @@ define([
 		} else (ret && ret.call(thisArg, result));
 	}
 
-	function parseJSON(value) {
+	function json_parse(value) {
 		if (isUndefined(Global.JSON))
-			return JSONParser(value);
-		else return JSON.parse(value);
+			return JSON.parse(value);
+		else return Global.JSON.parse(value);
+	}
+
+	function json_stringify(value) {
+		if (isUndefined(Global.JSON))
+			return JSON.stringify(value);
+		else return Global.JSON.stringify(value);
 	}
 
 	function string_trimLeft(value) {
@@ -293,7 +296,12 @@ define([
 		mapAsync: mapAsync,
 		base64decode: base64decode,
 		hasOwnProperty: hasOwnProperty,
-		parseJSON: parseJSON,
+
+		json: {
+			parse: json_parse,
+			stringify: json_stringify
+		},
+
 		object: {
 			clone: object_clone,
 			merge: object_merge

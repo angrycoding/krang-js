@@ -16,7 +16,7 @@ define([
 				requestData = Utils.base64decode(requestData);
 			else requestData = decodeURIComponent(requestData);
 			if (uriObj.type === 'application/json')
-				requestData = Utils.parseJSON(requestData);
+				requestData = Utils.json.parse(requestData);
 			return requestData;
 		} catch (exception) {
 			throw new Krang.DataURIException(
@@ -54,9 +54,7 @@ define([
 
 		function loadResource(resourceURI, ret, baseURI) {
 			Krang.message('loading', resourceURI);
-			ScriptTransport(config, resourceURI, function() {
-				var definition = Krang.defines.shift();
-				var deps = definition[0], def = definition[1];
+			ScriptTransport(config, resourceURI, function(deps, def) {
 				parseDependencies(resourceURI, deps, function(deps) {
 					ret([deps, def]);
 				});
@@ -88,7 +86,10 @@ define([
 			}
 
 			dependencyURI = Utils.string.trimRight(dependencyURI);
-			var pluginURI = dependencyURI.split(/\s*!+\s*/);
+			var pluginURI = dependencyURI.replace(/\s*!+\s*/g, '!');
+			pluginURI = pluginURI.split('!');
+
+			if (pluginURI[0] === 'module') pluginURI.unshift('');
 
 			if (dependencyURI = pluginURI.shift()) {
 				pluginURI = pluginURI.join('!');
