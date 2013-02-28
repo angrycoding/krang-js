@@ -1,5 +1,5 @@
 var FileSystem = require('fs');
-// var UglifyJS = require('uglify-js');
+var UglifyJS = require('uglify-js');
 var Bootstrapper = require('./bootstrap.js');
 
 Bootstrapper.require([
@@ -19,11 +19,11 @@ Bootstrapper.require([
 		Bootstrapper.build('../src/main.js', function(ResultKrang) {
 			tpl.render(function(ResultKrang) {
 				FileSystem.writeFile(targetFile, ResultKrang, function() {
-					// console.info('compressing', targetFile);
-					// var result = UglifyJS.minify(targetFile).code;
-					// FileSystem.writeFile(targetFile, result, function() {
+					console.info('compressing', targetFile);
+					var result = UglifyJS.minify(targetFile).code;
+					FileSystem.writeFile(targetFile, result, function() {
 						console.info('done', targetFile);
-					// });
+					});
 				});
 			}, {module: ResultKrang, alias: 'krang'});
 
