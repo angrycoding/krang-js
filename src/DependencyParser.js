@@ -39,8 +39,17 @@ define([
 	var hashTable = {};
 	var lastID = 0;
 
+	function uniqueId(prefix) {
+		if (!Utils.isString(prefix)) prefix = '';
+		var partOne = new Date().getTime();
+		return (prefix + partOne.toString(36) +
+			(1 + Math.floor((Math.random()*32767))).toString(36) +
+			(1 + Math.floor((Math.random()*32767))).toString(36)
+		);
+	}
+
 	function nextID() {
-		return '__KRANG' + (++lastID) + '__';
+		return uniqueId('__KRANG' + (++lastID) + '__') + '__';
 	}
 
 	function generateID(hash) {
@@ -53,7 +62,7 @@ define([
 	return function(config, dependencies, ret) {
 
 		function loadResource(resourceURI, ret, baseURI) {
-			Krang.message('loading', resourceURI);
+			if (config.debug) Krang.message('loading', resourceURI);
 			ScriptTransport(config, resourceURI, function(deps, def) {
 				parseDependencies(resourceURI, deps, function(deps) {
 					ret([deps, def]);

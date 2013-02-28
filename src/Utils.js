@@ -34,6 +34,10 @@ define(['!global', 'JSON'], function(Global, JSON) {
 		return (value === undefined);
 	}
 
+	function isBoolean(value) {
+		return (typeof(value) === 'boolean');
+	}
+
 	function isString(value) {
 		return (typeof value === 'string');
 	}
@@ -146,7 +150,7 @@ define(['!global', 'JSON'], function(Global, JSON) {
 						if (--toLoad) return;
 						(ret && ret.call(thisArg, result));
 					};
-				}(index));
+				}(index), index);
 			}
 		} else (ret && ret.call(thisArg, result));
 	}
@@ -289,6 +293,7 @@ define(['!global', 'JSON'], function(Global, JSON) {
 
 	return {
 		isUndefined: isUndefined,
+		isBoolean: isBoolean,
 		isString: isString,
 		isArray: isArray,
 		isFunction: isFunction,

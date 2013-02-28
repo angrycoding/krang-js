@@ -1,19 +1,19 @@
 (function(global) {
 
-	
-	
 
-	
-		
-		
-		
+
+
+
+
+
+
 			var __KRANG1__ = global;
-		
-	
-		
-		
-		
-			var __KRANG4__ = (function () {
+
+
+
+
+
+			var __KRANG5__ = (function () {
   var number
 	  = '(?:-?\\b(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?\\b)';
   var oneChar = '(?:[^\\0-\\x08\\x0a-\\x1f\"\\\\]'
@@ -219,12 +219,12 @@
   };
 
 })();
-		
-	
-		
-		
-		
-			var __KRANG5__ = (function (Global, JSON) {
+
+
+
+
+
+			var __KRANG6__ = (function (Global, JSON) {
 
 	var URL_DIRNAME_REGEXP = /^(.*)\//;
 	var FILE_TYPE_REGEXP = /.+\.([^\.]+)$/;
@@ -258,6 +258,10 @@
 
 	function isUndefined(value) {
 		return (value === undefined);
+	}
+
+	function isBoolean(value) {
+		return (typeof(value) === 'boolean');
 	}
 
 	function isString(value) {
@@ -372,7 +376,7 @@
 						if (--toLoad) return;
 						(ret && ret.call(thisArg, result));
 					};
-				}(index));
+				}(index), index);
 			}
 		} else (ret && ret.call(thisArg, result));
 	}
@@ -515,6 +519,7 @@
 
 	return {
 		isUndefined: isUndefined,
+		isBoolean: isBoolean,
 		isString: isString,
 		isArray: isArray,
 		isFunction: isFunction,
@@ -547,92 +552,18 @@
 		}
 	};
 
-})(__KRANG1__,__KRANG4__);
-		
-	
-		
-		
-		
-			var __KRANG2__ = (function () {
+})(__KRANG1__,__KRANG5__);
 
-	function message(message) {
-		var args = Array.prototype.slice.call(arguments);
-		args.unshift('[ KRANG ]');
-		console.log(args.join(' '));
-	}
 
-	function KrangException(file, message) {
-		return {
-			file: file,
-			toString: function() { return message; }
-		};
-	}
 
-	function TypeException(file, dependency) {
-		return KrangException(file, (
-			'dependency must be a string, array or map, but "' +
-			dependency + '" found (' + file + ')'
-		));
-	}
 
-	function DataURIException(file, dataURI, message) {
-		return KrangException(file, (
-			'error decoding "' +
-			dataURI + '" with message "' +
-			message + '" (' + file + ')'
-		));
-	}
 
-	function AliasException(file, dependency) {
-		return KrangException(file, (
-			'failed to resolve dependency alias "@' +
-			dependency + '" for "' + file + '"'
-		));
-	}
+			var __KRANG2__ = {"uri": "MY_BASE_URI"};
 
-	function LoadException(file, dependency, message) {
-		return KrangException(file, (
-			'failed to load dependency "' +
-			dependency + '" for "' + file + '" ' +
-			'with message "' + message + '"'
-		));
-	}
 
-	function define(moduleID, args, ret) {
-		var args = Array.prototype.slice.call(args);
-		var dependencies, definition = args.shift();
-		if (args.length) {
-			dependencies = definition;
-			definition = args.shift();
-		}
-		ret(dependencies, definition);
-	}
 
-	return {
-		T_VALUE: 1,
-		T_CONFIG: 2,
-		T_GLOBAL: 3,
-		T_MODULE: 4,
-		T_RESOURCE: 5,
 
-		VERSION: 0.4,
 
-		message: message,
-		define: define,
-
-		TypeException: TypeException,
-		AliasException: AliasException,
-		DataURIException: DataURIException,
-		LoadException: LoadException
-
-	};
-
-})();
-		
-	
-		
-		
-		
 			var __KRANG3__ = (function (Global) {
 
 	var featureObj = {};
@@ -679,12 +610,164 @@
 	return featureObj;
 
 })(__KRANG1__);
-		
-	
-		
-		
-		
-			var __KRANG6__ = (function (Utils) {
+
+
+
+
+
+			var __KRANG4__ = (function (Global, Module, Environment) {
+
+	var scripts = [];
+	var defined = {};
+
+	if (Environment.browser && Global.document &&
+		Global.document.getElementsByTagName) {
+		scripts = document.getElementsByTagName('script');
+	}
+
+	function message(message) {
+		var args = Array.prototype.slice.call(arguments);
+		args.unshift('[ KRANG ]');
+		console.log(args.join(' '));
+	}
+
+	function KrangException(file, message) {
+		return {
+			file: file,
+			toString: function() { return message; }
+		};
+	}
+
+	function TypeException(file, dependency) {
+		return KrangException(file, (
+			'dependency must be a string, array or map, but "' +
+			dependency + '" found (' + file + ')'
+		));
+	}
+
+	function DataURIException(file, dataURI, message) {
+		return KrangException(file, (
+			'error decoding "' +
+			dataURI + '" with message "' +
+			message + '" (' + file + ')'
+		));
+	}
+
+	function AliasException(file, dependency) {
+		return KrangException(file, (
+			'failed to resolve dependency alias "@' +
+			dependency + '" for "' + file + '"'
+		));
+	}
+
+	function LoadException(file, dependency, message) {
+		return KrangException(file, (
+			'failed to load dependency "' +
+			dependency + '" for "' + file + '" ' +
+			'with message "' + message + '"'
+		));
+	}
+
+	function MissingDefinition(file) {
+		return KrangException(file, (
+			'failed to load dependency "' + file + '" ' +
+			'with message "missing required define call"'
+		));
+	}
+
+	function DuplicateDefinition(file) {
+		return KrangException(file, (
+			'failed to load dependency "' + file + '" ' +
+			'with message "duplicate define call"'
+		));
+	}
+
+	function define(moduleID, args, ret) {
+		if (!defined.hasOwnProperty(moduleID)) {
+			defined[moduleID] = true;
+			var args = Array.prototype.slice.call(args);
+			var dependencies, definition = args.shift();
+			if (args.length) {
+				dependencies = definition;
+				definition = args.shift();
+			}
+			ret(dependencies, definition);
+		} else throw new DuplicateDefinition(moduleID);
+	}
+
+	function getBaseURI() {
+		if (Environment.nodejs) return module.parent.filename;
+		if (Environment.browser) return Global.location.href;
+	}
+
+	function getCurrentScript() {
+		var caller;
+
+		if (caller = arguments.callee.caller) {
+			do {
+				if (!caller.hasOwnProperty('currentScript')) continue;
+				return {src: caller.currentScript};
+			} while (caller = caller.caller);
+		}
+
+		if (!Environment.browser) return;
+
+		if (Global.document && Global.document.currentScript) {
+			return Global.document.currentScript;
+		}
+
+		else try { throw new Error(); } catch (exception) {
+
+			if (exception.stack) {
+				caller = exception.stack;
+				if (caller.indexOf('@') === -1) {
+					caller = caller.split('\n').pop();
+					caller = caller.split(' ').pop();
+				} else caller = caller.split('@').pop();
+				caller = caller.split(/(\:\d+)+\s*$/).shift();
+				for (var c = 0; c < scripts.length; c++) {
+					if (scripts[c].src !== caller) continue;
+					return scripts[c];
+				}
+			}
+
+			else for (var c = 0; c < scripts.length; c++) {
+				if (scripts[c].readyState !== 'interactive') continue;
+				return scripts[c];
+			}
+
+		}
+	}
+
+	return {
+		T_VALUE: 1,
+		T_CONFIG: 2,
+		T_GLOBAL: 3,
+		T_MODULE: 4,
+		T_RESOURCE: 5,
+
+		VERSION: 0.4,
+
+		message: message,
+		define: define,
+		getBaseURI: getBaseURI,
+		getCurrentScript: getCurrentScript,
+
+		TypeException: TypeException,
+		AliasException: AliasException,
+		DataURIException: DataURIException,
+		LoadException: LoadException,
+		MissingDefinition: MissingDefinition
+
+	};
+
+})(__KRANG1__,__KRANG2__,__KRANG3__);
+
+
+
+
+
+			var __KRANG7__ = (function (Utils) {
 
 	var RES_IDLE = 0;
 	var RES_LOADING = 1;
@@ -771,13 +854,13 @@
 		}
 	};
 
-})(__KRANG5__);
-		
-	
-		
-		
-		
-			var __KRANG7__ = (function (Utils, Krang) {
+})(__KRANG6__);
+
+
+
+
+
+			var __KRANG11__ = (function (Utils, Krang) {
 
 	var URL, Schemes;
 	var initialized = false;
@@ -832,9 +915,18 @@
 				response.on('end', function() {
 					try {
 
-						new Function('define, require', data)(function() {
+						var hasDefinition = false;
+						var runner = new Function('define, require, module', data);
+						runner.currentScript = requestURI;
+
+						runner(function() {
+							hasDefinition = true;
 							Krang.define(requestURI, arguments, success);
-						}, require);
+						}, require, module);
+
+						if (!hasDefinition) {
+							throw new Krang.MissingDefinition(requestURI);
+						}
 
 					} catch (exception) {
 						fail(exception);
@@ -850,9 +942,9 @@
 					if (error) return fail(error);
 					try {
 
-						new Function('define, require', data.toString())(function() {
+						new Function('define, require, module', data.toString())(function() {
 							Krang.define(requestURI, arguments, success);
-						}, require);
+						}, require, module);
 
 					} catch (exception) {
 						fail(exception);
@@ -864,45 +956,25 @@
 	}
 
 	return Driver;
-})(__KRANG5__,__KRANG2__);
-		
-	
-		
-		
-		
-			var __KRANG8__ = (function (Global, Utils, Krang) {
+})(__KRANG6__,__KRANG4__);
 
-	var scripts, defineMap = {};
 
-	if (Global.document && Global.document.getElementsByTagName)
-		scripts = document.getElementsByTagName('script');
+
+
+
+			var __KRANG10__ = (function (Global, Utils, Krang) {
+
+	var defineMap = {};
 
 	Global.define = function() {
-
-		var scriptURI = null;
-
-		if (Global.document && Global.document.currentScript) {
-			scriptURI = Global.document.currentScript.src;
-		} else try { throw new Error(); } catch (exception) {
-			if (exception.stack) {
-				scriptURI = exception.stack;
-				if (scriptURI.indexOf('@') === -1) {
-					scriptURI = scriptURI.split('\n').pop();
-					scriptURI = scriptURI.split(' ').pop();
-				} else scriptURI = scriptURI.split('@').pop();
-				scriptURI = scriptURI.split(/(\:\d+)+\s*$/).shift();
-			} else for (var c = 0; c < scripts.length; c++) {
-				if (scripts[c].readyState === 'interactive') {
-					scriptURI = scripts[c].src;
-					break;
-				}
-			}
-		}
-
+		var currentScript = Krang.getCurrentScript();
+		if (!currentScript) return false;
+		var scriptURI = currentScript.src;
 		if (!defineMap.hasOwnProperty(scriptURI)) return false;
-		Krang.define(scriptURI, arguments, defineMap[scriptURI]);
+		var callback = defineMap[scriptURI];
+		callback.called = true;
+		Krang.define(scriptURI, arguments, callback);
 		return true;
-
 	};
 
 
@@ -937,6 +1009,11 @@
 		sElement.setAttribute('async', 'async');
 		sElement.setAttribute('src', requestURI);
 		defineMap[requestURI] = success;
+		sElement.onload = function() {
+			if (!defineMap[this.src].called) {
+				throw new Krang.MissingDefinition(this.src);
+			}
+		};
 		document.getElementsByTagName('head')[0].appendChild(sElement);
 	}
 
@@ -950,11 +1027,16 @@
 				var status = request.status;
 				if (status !== 200) return fail('not found');
 				try {
-
-					new Function('define', request.responseText)(function() {
+					var hasDefinition = false;
+					var runner = new Function('define', request.responseText);
+					runner.currentScript = requestURI;
+					runner(function() {
+						hasDefinition = true;
 						Krang.define(requestURI, arguments, success);
 					});
-
+					if (!hasDefinition) {
+						throw new Krang.MissingDefinition(requestURI);
+					}
 				} catch (exception) {
 					fail(exception);
 				}
@@ -971,13 +1053,13 @@
 		else doXMLHTTPRequest(requestURI, success, fail);
 	};
 
-})(__KRANG1__,__KRANG5__,__KRANG2__);
-		
-	
-		
-		
-		
-			var __KRANG9__ = (function (Utils, Environment, NodeDriver, BrowserDriver) {
+})(__KRANG1__,__KRANG6__,__KRANG4__);
+
+
+
+
+
+			var __KRANG12__ = (function (Utils, Environment, NodeDriver, BrowserDriver) {
 
 	var driverInstance = null;
 
@@ -1000,13 +1082,13 @@
 		driverInstance(requestURI, success, fail);
 	};
 
-})(__KRANG5__,__KRANG3__,__KRANG7__,__KRANG8__);
-		
-	
-		
-		
-		
-			var __KRANG10__ = (function () {
+})(__KRANG6__,__KRANG3__,__KRANG11__,__KRANG10__);
+
+
+
+
+
+			var __KRANG8__ = (function () {
 
 	var T_EOF = -1,
 	T_FRAGMENT = 0,
@@ -1141,12 +1223,12 @@
 
 	return Tokenizer;
 })();
-		
-	
-		
-		
-		
-			var __KRANG11__ = (function (Tokenizer, Utils) {
+
+
+
+
+
+			var __KRANG9__ = (function (Tokenizer, Utils) {
 
 	var tokenizer, fileName, context;
 
@@ -1358,13 +1440,13 @@
 	}
 
 	return Evaluator;
-})(__KRANG10__,__KRANG5__);
-		
-	
-		
-		
-		
-			var __KRANG12__ = (function (Utils, Krang, Environment,
+})(__KRANG8__,__KRANG6__);
+
+
+
+
+
+			var __KRANG13__ = (function (Utils, Krang, Environment,
 	ResourceLoader, ScriptTransport, ExpressionEngine) {
 
 	var expressionEngine = new ExpressionEngine(Environment);
@@ -1400,8 +1482,17 @@
 	var hashTable = {};
 	var lastID = 0;
 
+	function uniqueId(prefix) {
+		if (!Utils.isString(prefix)) prefix = '';
+		var partOne = new Date().getTime();
+		return (prefix + partOne.toString(36) +
+			(1 + Math.floor((Math.random()*32767))).toString(36) +
+			(1 + Math.floor((Math.random()*32767))).toString(36)
+		);
+	}
+
 	function nextID() {
-		return '__KRANG' + (++lastID) + '__';
+		return uniqueId('__KRANG' + (++lastID) + '__') + '__';
 	}
 
 	function generateID(hash) {
@@ -1414,7 +1505,7 @@
 	return function(config, dependencies, ret) {
 
 		function loadResource(resourceURI, ret, baseURI) {
-			Krang.message('loading', resourceURI);
+			if (config.debug) Krang.message('loading', resourceURI);
 			ScriptTransport(config, resourceURI, function(deps, def) {
 				parseDependencies(resourceURI, deps, function(deps) {
 					ret([deps, def]);
@@ -1521,13 +1612,13 @@
 
 	};
 
-})(__KRANG5__,__KRANG2__,__KRANG3__,__KRANG6__,__KRANG9__,__KRANG11__);
-		
-	
-		
-		
-		
-			var __KRANG13__ = (function (Global, Krang, Utils, DependencyParser, ResourceLoader) {
+})(__KRANG6__,__KRANG4__,__KRANG3__,__KRANG7__,__KRANG12__,__KRANG9__);
+
+
+
+
+
+			var __KRANG14__ = (function (Global, Krang, Utils, DependencyParser, ResourceLoader) {
 
 	function DependencyEvaluator(config, dependencies, ret, krang, isBuildTime) {
 
@@ -1545,7 +1636,7 @@
 							resourceData.krang(baseURI, pluginURI, ret, krang, isBuildTime);
 						} else ret(resourceData);
 					}, function(resourceURI, ret) {
-						Krang.message('evaluating', resourceURI);
+						if (config.debug) Krang.message('evaluating', resourceURI);
 						var resource = ResourceLoader(resourceURI);
 						var def = resource[1], deps = resource[0];
 						if (!Utils.isFunction(def)) return ret(def);
@@ -1580,13 +1671,13 @@
 
 	return DependencyEvaluator;
 
-})(__KRANG1__,__KRANG2__,__KRANG5__,__KRANG12__,__KRANG6__);
-		
-	
-		
-		
-		
-			var __KRANG14__ = (function (Krang, Utils, ResourceLoader, DependencyEvaluator) {
+})(__KRANG1__,__KRANG4__,__KRANG6__,__KRANG13__,__KRANG7__);
+
+
+
+
+
+			var __KRANG15__ = (function (Krang, Utils, ResourceLoader, DependencyEvaluator) {
 
 	function serialize(def, deps) {
 		if (Utils.isFunction(def)) {
@@ -1710,70 +1801,73 @@
 
 	return buildDependencies;
 
-})(__KRANG2__,__KRANG5__,__KRANG6__,__KRANG13__);
-		
-	
-		
-		
-		
-			var krang = (function (Global, Utils, Krang, Environment,
+})(__KRANG4__,__KRANG6__,__KRANG7__,__KRANG14__);
+
+
+
+
+
+			var krang = (function (Utils, Krang, Environment,
 	DependencyParser, DependencyBuilder, DependencyEvaluator) {
+
+	function parseArguments(arguments) {
+		var dependencies = [], callback = null;
+		var args = Array.prototype.slice.call(arguments);
+		if (Utils.isString(args[0])) dependencies = [args.shift()];
+		else if (Utils.isArray(args[0])) dependencies = args.shift();
+		if (Utils.isFunction(args[0])) callback = args.shift();
+		return [dependencies, callback];
+	}
+
+	function mergeConfigs(oldConfig, newConfig) {
+		var baseURI = oldConfig.baseURI;
+		var newConfig = Utils.object.clone(newConfig);
+		if (Utils.hasOwnProperty(newConfig, 'baseURI')) {
+			if (Utils.isString(newConfig.baseURI)) {
+				baseURI = newConfig.baseURI =
+				Utils.uri.resolve(newConfig.baseURI, baseURI);
+			} else delete newConfig.baseURI;
+		}
+		if (Utils.hasOwnProperty(newConfig, 'cache') &&
+			!Utils.isBoolean(newConfig.cache)) {
+			newConfig.cache = String(newConfig.cache);
+		}
+		if (Utils.hasOwnProperty(newConfig, 'packages')) {
+			var packages = newConfig.packages;
+			if (Utils.isMap(packages)) {
+				var packageID, packageURI;
+				for (packageID in packages) {
+					packageURI = packages[packageID];
+					packageURI = Utils.string.trimLeft(packageURI);
+					if (!Utils.isString(packageURI)) {
+						delete packages[packageID];
+					} else packages[packageID] = Utils.uri.resolve(
+						packageURI, baseURI
+					);
+				}
+			} else if (!Utils.isUndefined(packages)) {
+				delete newConfig.packages;
+			}
+		}
+		return Utils.object.merge(oldConfig, newConfig);
+	}
 
 	function Context(config) {
 
+		if (config.debug) Krang.message(
+			'applying configuration:',
+			Utils.json.stringify(config)
+		);
+
 		function factory(newConfig) {
-
-			Krang.message(
-				'validating configuration:',
-				Utils.json.stringify(newConfig)
-			);
-
-			var baseURI = config.baseURI;
-			var newConfig = Utils.object.clone(newConfig);
-
-			if (Utils.hasOwnProperty(newConfig, 'baseURI')) {
-				if (Utils.isString(newConfig.baseURI)) {
-					baseURI = newConfig.baseURI =
-					Utils.uri.resolve(newConfig.baseURI, baseURI);
-				} else delete newConfig.baseURI;
-			}
-
-			if (Utils.hasOwnProperty(newConfig, 'packages')) {
-				var packages = newConfig.packages;
-				if (Utils.isMap(packages)) {
-					var packageID, packageURI;
-					for (packageID in packages) {
-						packageURI = packages[packageID];
-						packageURI = Utils.string.trimLeft(packageURI);
-						if (!Utils.isString(packageURI)) {
-							delete packages[packageID];
-						} else packages[packageID] = Utils.uri.resolve(
-							packageURI, baseURI
-						);
-					}
-				} else if (!Utils.isUndefined(packages)) {
-					delete newConfig.packages;
-				}
-			}
-
-			newConfig = Utils.object.merge(config, newConfig);
-
-			Krang.message(
-				'new configuration is:',
-				Utils.json.stringify(newConfig)
-			);
-
-			return Context(newConfig);
+			return Context(mergeConfigs(config, newConfig));
 		}
 
 		factory.version = Krang.VERSION;
 
 		factory.require = function() {
-			var deps = [], callback = null;
-			var args = Array.prototype.slice.call(arguments);
-			if (Utils.isString(args[0])) deps = [args.shift()];
-			else if (Utils.isArray(args[0])) deps = args.shift();
-			if (Utils.isFunction(args[0])) callback = args.shift();
+			var args = parseArguments(arguments);
+			var deps = args[0], callback = args[1];
 			if (callback) DependencyParser(config, deps, function(deps) {
 				DependencyEvaluator(config, deps, function(deps) {
 					callback.apply(this, deps);
@@ -1782,11 +1876,8 @@
 		};
 
 		factory.build = function() {
-			var deps = [], callback = null;
-			var args = Array.prototype.slice.call(arguments);
-			if (Utils.isString(args[0])) deps = [args.shift()];
-			else if (Utils.isArray(args[0])) deps = args.shift();
-			if (Utils.isFunction(args[0])) callback = args.shift();
+			var args = parseArguments(arguments);
+			var deps = args[0], callback = args[1];
 			if (callback) DependencyParser(config, deps, function(deps) {
 				Utils.mapAsync(deps, function(deps, ret) {
 					DependencyBuilder(config, deps, ret, factory);
@@ -1794,20 +1885,34 @@
 			});
 		};
 
+		factory.getCurrentScript = Krang.getCurrentScript;
+
 		return factory;
 	};
 
-	return Context({
+	var rootContext = Context({
 		cache: true,
-		baseURI: (
-			Environment.nodejs && module.parent.filename ||
-			Environment.browser && Global.location.href
-		)
+		debug: false,
+		baseURI: Krang.getBaseURI()
 	});
 
-})(__KRANG1__,__KRANG5__,__KRANG2__,__KRANG3__,__KRANG12__,__KRANG14__,__KRANG13__);
-		
-	
+	if (Environment.browser) {
+		var currentScript = Krang.getCurrentScript();
+		if (currentScript) {
+			currentScript.parentNode.removeChild(currentScript);
+			var mainScriptSrc = currentScript.getAttribute('data-main');
+			var mainScriptBody = (currentScript.innerText || '');
+			if (mainScriptSrc) rootContext.require(
+				mainScriptSrc, new Function('main', mainScriptBody)
+			); else if (mainScriptBody) new Function(mainScriptBody)();
+		}
+	}
+
+	return rootContext;
+
+})(__KRANG6__,__KRANG4__,__KRANG3__,__KRANG13__,__KRANG15__,__KRANG14__);
+
+
 
 	if (typeof this.process === 'object' &&
 		typeof this.process.version === 'string' &&

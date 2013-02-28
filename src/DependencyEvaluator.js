@@ -18,7 +18,7 @@ define([
 							resourceData.krang(baseURI, pluginURI, ret, krang, isBuildTime);
 						} else ret(resourceData);
 					}, function(resourceURI, ret) {
-						Krang.message('evaluating', resourceURI);
+						if (config.debug) Krang.message('evaluating', resourceURI);
 						var resource = ResourceLoader(resourceURI);
 						var def = resource[1], deps = resource[0];
 						if (!Utils.isFunction(def)) return ret(def);

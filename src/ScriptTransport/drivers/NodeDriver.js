@@ -53,9 +53,18 @@ define(['../../Utils', '../../Krang'], function(Utils, Krang) {
 				response.on('end', function() {
 					try {
 
-						new Function('define, require', data)(function() {
+						var hasDefinition = false;
+						var runner = new Function('define, require, module', data);
+						runner.currentScript = requestURI;
+
+						runner(function() {
+							hasDefinition = true;
 							Krang.define(requestURI, arguments, success);
-						}, require);
+						}, require, module);
+
+						if (!hasDefinition) {
+							throw new Krang.MissingDefinition(requestURI);
+						}
 
 					} catch (exception) {
 						fail(exception);
@@ -71,9 +80,9 @@ define(['../../Utils', '../../Krang'], function(Utils, Krang) {
 					if (error) return fail(error);
 					try {
 
-						new Function('define, require', data.toString())(function() {
+						new Function('define, require, module', data.toString())(function() {
 							Krang.define(requestURI, arguments, success);
-						}, require);
+						}, require, module);
 
 					} catch (exception) {
 						fail(exception);

@@ -3,29 +3,34 @@
 	<head>
 		<title></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<script type="text/javascript" src="krang.js?m"></script>
-
-
-		<script type="text/javascript" src="krang.js"></script>
+		<script type="text/javascript" src="krang.js" xdata-main="node.js">
+			// console.info(main);
+		</script>
 
 		<script type="text/javascript">
 
-			krang.require('src/main', function(krang) {
-
-				krang({
-					// cache: false
-				}).require([
-					// '../histone-javascript.git/src/Histone'
-					'https://raw.github.com/MegafonWebLab/histone-javascript/master/src/Histone.js'
-					// '../histone-javascript.git/src/Histone'
-				], function(bar, standalone2) {
-					var template = bar('{{2 * 2}}');
-					template.render(function(result) {
-						alert(result);
-					});
-				});
-
+			krang.require('a', function(a) {
+				console.info(a);
 			});
+
+			// krang.require('src/main', function(krang) {
+
+			// 	krang({
+			// 		cache: Math.random(),
+			// 		debug: true
+			// 	}).require([
+			// 		// '../histone-javascript.git/src/Histone'
+			// 		'https://raw.github.com/MegafonWebLab/histone-javascript/master/src/Histone.js'
+			// 		// '../histone-javascript.git/src/Histone'
+			// 	], function(bar, standalone2) {
+			// 		var template = bar('{{2 * 2}}');
+			// 		template.render(function(result) {
+			// 			console.info(result);
+			// 		});
+			// 		// console.info(bar);
+			// 	});
+
+			// });
 
 			// krang({
 			// 	cache: false,

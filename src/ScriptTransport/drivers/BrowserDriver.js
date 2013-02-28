@@ -4,37 +4,17 @@ define([
 	'../../Krang'
 ], function(Global, Utils, Krang) {
 
-	var scripts, defineMap = {};
-
-	if (Global.document && Global.document.getElementsByTagName)
-		scripts = document.getElementsByTagName('script');
+	var defineMap = {};
 
 	Global.define = function() {
-
-		var scriptURI = null;
-
-		if (Global.document && Global.document.currentScript) {
-			scriptURI = Global.document.currentScript.src;
-		} else try { throw new Error(); } catch (exception) {
-			if (exception.stack) {
-				scriptURI = exception.stack;
-				if (scriptURI.indexOf('@') === -1) {
-					scriptURI = scriptURI.split('\n').pop();
-					scriptURI = scriptURI.split(' ').pop();
-				} else scriptURI = scriptURI.split('@').pop();
-				scriptURI = scriptURI.split(/(\:\d+)+\s*$/).shift();
-			} else for (var c = 0; c < scripts.length; c++) {
-				if (scripts[c].readyState === 'interactive') {
-					scriptURI = scripts[c].src;
-					break;
-				}
-			}
-		}
-
+		var currentScript = Krang.getCurrentScript();
+		if (!currentScript) return false;
+		var scriptURI = currentScript.src;
 		if (!defineMap.hasOwnProperty(scriptURI)) return false;
-		Krang.define(scriptURI, arguments, defineMap[scriptURI]);
+		var callback = defineMap[scriptURI];
+		callback.called = true;
+		Krang.define(scriptURI, arguments, callback);
 		return true;
-
 	};
 
 
@@ -69,6 +49,11 @@ define([
 		sElement.setAttribute('async', 'async');
 		sElement.setAttribute('src', requestURI);
 		defineMap[requestURI] = success;
+		sElement.onload = function() {
+			if (!defineMap[this.src].called) {
+				throw new Krang.MissingDefinition(this.src);
+			}
+		};
 		document.getElementsByTagName('head')[0].appendChild(sElement);
 	}
 
@@ -82,11 +67,16 @@ define([
 				var status = request.status;
 				if (status !== 200) return fail('not found');
 				try {
-
-					new Function('define', request.responseText)(function() {
+					var hasDefinition = false;
+					var runner = new Function('define', request.responseText);
+					runner.currentScript = requestURI;
+					runner(function() {
+						hasDefinition = true;
 						Krang.define(requestURI, arguments, success);
 					});
-
+					if (!hasDefinition) {
+						throw new Krang.MissingDefinition(requestURI);
+					}
 				} catch (exception) {
 					fail(exception);
 				}

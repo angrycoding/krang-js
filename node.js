@@ -1,7 +1,8 @@
 require('./krang.js').require('src/main', function(krang) {
 
 	krang({
-		cache: false
+		cache: false,
+		debug: true
 	}).require([
 		// 'https://raw.github.com/MegafonWebLab/histone-javascript/master/src/Histone.js'
 		'../histone-javascript.git/src/Histone'
@@ -12,3 +13,6 @@ require('./krang.js').require('src/main', function(krang) {
 	});
 
 });
+
+// define(123);
+// define('foo');
