@@ -5,7 +5,7 @@
 	"devDependencies": {
 		"uglify-js": "2.2.5"
 	},
-	"files": "krang.js",
+	"files": ["krang.js"],
 	"scripts": {
 		"test": "node bootstrap/build.js"
 	}
