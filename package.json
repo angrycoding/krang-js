@@ -1,9 +1,11 @@
 {
-	"name": "Krang-JS",
+	"name": "krang-js",
 	"version": "0.0.4",
+	"main": "krang.js",
 	"devDependencies": {
 		"uglify-js": "2.2.5"
 	},
+	"files": "krang.js",
 	"scripts": {
 		"test": "node bootstrap/build.js"
 	}
