@@ -1,4 +1,7 @@
-define(['!global', '!module', 'Environment'], function(Global, Module, Environment) {
+define([
+	'!global',
+	'Environment'
+], function(Global, Environment) {
 
 	var scripts = [];
 	var defined = {};
@@ -128,20 +131,16 @@ define(['!global', '!module', 'Environment'], function(Global, Module, Environme
 		T_GLOBAL: 3,
 		T_MODULE: 4,
 		T_RESOURCE: 5,
-
-		VERSION: 0.4,
-
+		VERSION: '0.0.5',
 		message: message,
 		define: define,
 		getBaseURI: getBaseURI,
 		getCurrentScript: getCurrentScript,
-
 		TypeException: TypeException,
 		AliasException: AliasException,
 		DataURIException: DataURIException,
 		LoadException: LoadException,
 		MissingDefinition: MissingDefinition
-
 	};
 
 });
