@@ -1,3 +1,4 @@
+var FileSystem = require('fs');
 var Krang = require('../krang.js');
 
 function forEachAsync(list, iterator, ret) {
@@ -31,26 +32,34 @@ function forEachAsync(list, iterator, ret) {
 
 function runTestCase(testCase, ret) {
 	var test = testCase.test;
-	var expected = testCase.expected;
-	expected = JSON.stringify(expected);
+	console.info('running', test.toString().replace(/\n+/g, ''));
+
+	var expectedResult = testCase.expectedResult;
+	expectedResult = JSON.stringify(expectedResult);
+
 	test(Krang, function() {
-		var result = Array.prototype.slice.call(arguments);
-		result = JSON.stringify(result);
-		if (result !== expected) {
-			console.info('expected', expected);
-			console.info('result', result);
+		var actualResult = Array.prototype.slice.call(arguments);
+		actualResult = JSON.stringify(actualResult);
+
+		if (actualResult !== expectedResult) {
+			console.info('expected', expectedResult);
+			console.info('result', actualResult);
 			throw 'x';
 		}
+
 		ret();
 	});
 }
 
-Krang({
-	debug: true
-}).require('tests/base64.js', function(testCases) {
+var TestKrang = Krang({debug: true});
 
-	forEachAsync(testCases, runTestCase, function() {
-		console.info('done all');
+FileSystem.readdir('test/tests/', function(error, files) {
+	forEachAsync(files, function(file, ret) {
+		if (file.substr(-3) !== '.js') return ret();
+		TestKrang.require('tests/' + file, function(testCases) {
+			forEachAsync(testCases, runTestCase, ret);
+		});
+	}, function() {
+		console.info('DONE ALL?');
 	});
-
 });
