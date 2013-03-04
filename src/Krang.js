@@ -131,7 +131,7 @@ define([
 		T_GLOBAL: 3,
 		T_MODULE: 4,
 		T_RESOURCE: 5,
-		VERSION: '0.0.6',
+		VERSION: '0.0.7',
 		message: message,
 		define: define,
 		getBaseURI: getBaseURI,
