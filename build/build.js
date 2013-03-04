@@ -5,7 +5,7 @@ var Bootstrapper = require('krang-js');
 Bootstrapper({
 	debug: true
 }).require([
-	'../src/main.js',
+	'../src/Main.js',
 	'https://raw.github.com/MegafonWebLab/histone-javascript/master/src/Histone!build.tpl'
 ], function(SourceKrang, BuildTpl) {
 
@@ -16,7 +16,7 @@ Bootstrapper({
 	console.info('-------------------------------------------------------');
 
 	var targetFile = ('./krang.js');
-	Bootstrapper.build('../src/main.js', function(ResultKrang) {
+	Bootstrapper.build('../src/Main.js', function(ResultKrang) {
 		BuildTpl.render(function(ResultKrang) {
 			FileSystem.writeFile(targetFile, ResultKrang, function() {
 				console.info('compressing', targetFile);
