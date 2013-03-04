@@ -8,6 +8,8 @@
 	},
 	"files": ["krang.js"],
 	"scripts": {
-		"test": "node build/build.js"
+		"build": "node build/build.js",
+		"pretest": "npm run-script build",
+		"test": "node test/test.js"
 	}
 }
