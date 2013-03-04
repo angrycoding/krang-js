@@ -33,14 +33,6 @@ define(['!global'], function(Global) {
 		featureObj['nodejs'] = {'version': parseFloat(versionStr[0])};
 	}
 
-	else if (Global.Packages instanceof Object && typeof Global.Packages
-		.org.mozilla.javascript.Context.getCurrentContext) {
-		var versionStr = Packages.org.mozilla.javascript.Context;
-		versionStr = versionStr.getCurrentContext().getImplementationVersion();
-		versionStr = String(versionStr).match(/\d+\.\d+[\.\d+]*/);
-		featureObj['rhino'] = {'version': parseFloat(versionStr[0])};
-	}
-
 	return featureObj;
 
 });

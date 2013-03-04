@@ -1,6 +1,6 @@
 define([
 	'Utils', 'Krang', 'Environment',
-	'DependencyParser', 'DependencyBuilder', 'DependencyEvaluator'
+	'dependency/Parser', 'dependency/Builder', 'dependency/Evaluator'
 ], function(Utils, Krang, Environment,
 	DependencyParser, DependencyBuilder, DependencyEvaluator) {
 

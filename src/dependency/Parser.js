@@ -1,12 +1,7 @@
 define([
-	'Utils', 'Krang',
-	'Environment', 'ResourceLoader',
-	'ScriptTransport/ScriptTransport',
-	'ExpressionEngine/ExpressionEngine'
-], function(Utils, Krang, Environment,
-	ResourceLoader, ScriptTransport, ExpressionEngine) {
-
-	var expressionEngine = new ExpressionEngine(Environment);
+	'../Utils', '../Krang',
+	'../Environment', '../ResourceLoader', '../transport/Transport'
+], function(Utils, Krang, Environment, ResourceLoader, Transport) {
 
 	function decodeDataURI(baseURI, dataURI) {
 		var uriObj = Utils.uri.parseData(dataURI);
@@ -63,7 +58,7 @@ define([
 
 		function loadResource(resourceURI, ret, baseURI) {
 			if (config.debug) Krang.message('loading', resourceURI);
-			ScriptTransport(config, resourceURI, function(deps, def) {
+			Transport(config, resourceURI, function(deps, def) {
 				parseDependencies(resourceURI, deps, function(deps) {
 					ret([deps, def]);
 				});
@@ -138,24 +133,9 @@ define([
 
 		}
 
-		function parseDependencyMap(baseURI, dependency, ret) {
-			for (var expression in dependency) {
-				if (expressionEngine(expression, baseURI)) {
-					return parseDependency(
-						baseURI,
-						dependency[expression],
-						ret
-					);
-				}
-			}
-			ret();
-		}
-
 		function parseDependency(baseURI, dependency, ret) {
 			if (Utils.isString(dependency))
 				parseDependencyString(baseURI, dependency, ret);
-			else if (Utils.isMap(dependency))
-				parseDependencyMap(baseURI, dependency, ret);
 			else throw new Krang.TypeException(baseURI, dependency);
 		}
 

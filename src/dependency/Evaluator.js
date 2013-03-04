@@ -1,6 +1,6 @@
 define([
-	'!global', 'Krang', 'Utils', 'DependencyParser', 'ResourceLoader'
-], function(Global, Krang, Utils, DependencyParser, ResourceLoader) {
+	'!global', '../Krang', '../Utils', '../ResourceLoader'
+], function(Global, Krang, Utils, ResourceLoader) {
 
 	function DependencyEvaluator(config, dependencies, ret, krang, isBuildTime) {
 

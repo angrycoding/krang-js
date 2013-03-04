@@ -26,7 +26,7 @@ define([
 
 	function TypeException(file, dependency) {
 		return KrangException(file, (
-			'dependency must be a string, array or map, but "' +
+			'dependency must be a string or array, but "' +
 			dependency + '" found (' + file + ')'
 		));
 	}
@@ -131,7 +131,7 @@ define([
 		T_GLOBAL: 3,
 		T_MODULE: 4,
 		T_RESOURCE: 5,
-		VERSION: '0.0.5',
+		VERSION: '0.0.6',
 		message: message,
 		define: define,
 		getBaseURI: getBaseURI,

@@ -1,6 +1,6 @@
 define([
-	'Krang', 'Utils', 'ResourceLoader', 'DependencyEvaluator'
-], function(Krang, Utils, ResourceLoader, DependencyEvaluator) {
+	'../Krang', '../Utils', '../ResourceLoader', 'Evaluator'
+], function(Krang, Utils, ResourceLoader, Evaluator) {
 
 	function serialize(def, deps) {
 		if (Utils.isFunction(def)) {
@@ -33,7 +33,7 @@ define([
 
 					if (pluginURI) {
 
-						return DependencyEvaluator(config, dependency, function(dependency) {
+						return Evaluator(config, dependency, function(dependency) {
 
 							var dependency = dependency[0];
 							for (var c = 0; c < dependency.length; c++) {
