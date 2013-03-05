@@ -208,23 +208,22 @@ define(['!global', 'JSON'], function(Global, JSON) {
 	}
 
 	function uri_parseData(dataURI) {
-		var keyValue, result = {
-			type: 'text/plain',
-			data: '', encoding: '',
-			params: {charset: 'US-ASCII'}
+		if (!isString(dataURI)) return;
+		if (!string_startsWith(dataURI, 'data:', true)) return;
+		var keyValue = dataURI.substr(5).split(',');
+		if (keyValue.length < 2) return;
+		dataURI = keyValue.shift().split(';');
+		var result = {
+			encoding: '',
+			data: keyValue.join(','),
+			params: {charset: 'US-ASCII'},
+			type: dataURI.shift() || 'text/plain'
 		};
-		if (isString(dataURI) &&
-			string_startsWith(dataURI, 'data:', true)) {
-			keyValue = dataURI.substr(5).split(',');
-			dataURI = keyValue.shift().split(';');
-			result.data = keyValue.join(',');
-			result.type = dataURI.shift();
-			while (dataURI.length) {
-				keyValue = dataURI.shift().split('=');
-				if (isString(keyValue[1]))
-					result.params[keyValue[0]] = keyValue[1];
-				else result.encoding = keyValue[0];
-			}
+		while (dataURI.length) {
+			keyValue = dataURI.shift().split('=');
+			if (isString(keyValue[1]))
+				result.params[keyValue[0]] = keyValue[1];
+			else result.encoding = keyValue[0];
 		}
 		return result;
 	}

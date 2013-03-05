@@ -31,14 +31,6 @@ define([
 		));
 	}
 
-	function DataURIException(file, dataURI, message) {
-		return KrangException(file, (
-			'error decoding "' +
-			dataURI + '" with message "' +
-			message + '" (' + file + ')'
-		));
-	}
-
 	function AliasException(file, dependency) {
 		return KrangException(file, (
 			'failed to resolve dependency alias "@' +
@@ -138,7 +130,6 @@ define([
 		getCurrentScript: getCurrentScript,
 		TypeException: TypeException,
 		AliasException: AliasException,
-		DataURIException: DataURIException,
 		LoadException: LoadException,
 		MissingDefinition: MissingDefinition
 	};

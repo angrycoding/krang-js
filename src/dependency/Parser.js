@@ -4,21 +4,16 @@ define([
 ], function(Utils, Krang, Environment, ResourceLoader, Transport) {
 
 	function decodeDataURI(baseURI, dataURI) {
-		var uriObj = Utils.uri.parseData(dataURI);
-		var requestData = uriObj.data;
 		try {
+			var uriObj = Utils.uri.parseData(dataURI);
+			var requestData = uriObj.data;
 			if (uriObj.encoding === 'base64')
 				requestData = Utils.base64decode(requestData);
 			else requestData = decodeURIComponent(requestData);
 			if (uriObj.type === 'application/json')
 				requestData = Utils.json.parse(requestData);
 			return requestData;
-		} catch (exception) {
-			throw new Krang.DataURIException(
-				baseURI, dataURI,
-				exception.message || exception
-			);
-		}
+		} catch (exception) {}
 	}
 
 	function resolveDependencyURI(dependencyURI, baseURI) {
@@ -92,8 +87,6 @@ define([
 			dependencyURI = Utils.string.trimRight(dependencyURI);
 			var pluginURI = dependencyURI.replace(/\s*!+\s*/g, '!');
 			pluginURI = pluginURI.split('!');
-
-			if (pluginURI[0] === 'module') pluginURI.unshift('');
 
 			if (dependencyURI = pluginURI.shift()) {
 				pluginURI = pluginURI.join('!');
